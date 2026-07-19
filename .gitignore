@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.idea/
+.idea/workspace.xml
+C:\Users\althe\.gemini\antigravity\brain\2d8a2797-b2db-4409-984e-5977023d1b8c\scratch\test_api.py

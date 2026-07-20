@@ -1,7 +1,23 @@
+# Entorno virtual
 .venv/
+
+# Archivos compilados de Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Variables de entorno (nunca subir credenciales)
 .env
+.env.*
+
+# Configuracion del IDE
 .idea/
-.idea/workspace.xml
-C:\Users\althe\.gemini\antigravity\brain\2d8a2797-b2db-4409-984e-5977023d1b8c\scratch\test_api.py
+
+# Archivos de cobertura de tests
+coverage/
+*.coverage
+
+# Archivos de sistema de Windows
+Thumbs.db
+desktop.ini

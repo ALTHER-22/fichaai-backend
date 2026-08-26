@@ -11,10 +11,14 @@ class FichaTecnica(db.Model):
     id_dispositivo   = db.Column(UUID(as_uuid=True), db.ForeignKey('dispositivo.id_dispositivo'), nullable=False)
     modelo           = db.Column(db.String(200))
     procesador       = db.Column(db.String(200))
-    camara_principal = db.Column(db.String(200))
+    ram              = db.Column(db.String(100))
     almacenamiento   = db.Column(db.String(100))
+    pantalla         = db.Column(db.String(200))
+    camara_principal = db.Column(db.String(200))
+    bateria          = db.Column(db.String(100))
     precio_oficial   = db.Column(db.Numeric(10, 2))
     moneda           = db.Column(db.String(3), default='USD')
+    url_imagen       = db.Column(db.Text)
     contenido_raw    = db.Column(db.Text)
     fecha_generacion = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -28,9 +32,13 @@ class FichaTecnica(db.Model):
             'id_dispositivo':   str(self.id_dispositivo),
             'modelo':           self.modelo,
             'procesador':       self.procesador,
-            'camara_principal': self.camara_principal,
+            'ram':              self.ram,
             'almacenamiento':   self.almacenamiento,
+            'pantalla':         self.pantalla,
+            'camara_principal': self.camara_principal,
+            'bateria':          self.bateria,
             'precio_oficial':   float(self.precio_oficial) if self.precio_oficial else None,
             'moneda':           self.moneda,
+            'url_imagen':       self.url_imagen,
             'fecha_generacion': self.fecha_generacion.isoformat()
         }

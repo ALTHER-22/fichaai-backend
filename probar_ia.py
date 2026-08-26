@@ -8,9 +8,9 @@ if sys.platform.startswith('win'):
 from app.services.gemini_service import GeminiService
 
 def main():
-    print("=" * 70)
+    print("=" * 80)
     print("       MOTOR DE BUSQUEDA INTELIGENTE - FichaAI (Gemini AI)")
-    print("=" * 70)
+    print("=" * 80)
     print("Puedes escribir:")
     print(" 1. Solo el nombre del celular (ej: 'Tecno Spark 20 Pro', 'Samsung S24')")
     print(" 2. O pegar un texto con especificaciones tecnicas.")
@@ -25,26 +25,30 @@ def main():
                 print("\nHasta luego!")
                 break
 
-            print(f"\n[...] Buscando datos oficiales y foto para: '{entrada}'...")
+            print(f"\n[...] Buscando datos oficiales completos y foto para: '{entrada}'...")
             
             resultado = GeminiService.extraer_ficha_desde_texto(entrada)
             
-            print("\n" + "=" * 70)
+            print("\n" + "=" * 80)
             print("                 FICHA TECNICA COMPLETA GENERADA")
-            print("=" * 70)
-            print(f"  📱 Modelo:           {resultado.get('modelo')}")
-            print(f"  🖥️  Pantalla:         {resultado.get('pantalla') or 'No especificada'}")
-            print(f"  ⚡ Procesador:       {resultado.get('procesador') or 'No especificado'}")
-            print(f"  🧠 Memoria RAM:      {resultado.get('ram') or 'No especificada'}")
-            print(f"  💾 Almacenamiento:   {resultado.get('almacenamiento') or 'No especificado'}")
-            print(f"  📸 Camara Principal: {resultado.get('camara_principal') or 'No especificada'}")
-            print(f"  🔋 Bateria y Carga:  {resultado.get('bateria') or 'No especificada'}")
-            print(f"  💰 Precio Oficial:   ${resultado.get('precio_oficial')} {resultado.get('moneda')}")
-            print(f"  🖼️  Foto Oficial:     {resultado.get('url_imagen') or 'No disponible'}")
-            print("=" * 70)
+            print("=" * 80)
+            print(f"  📱 Modelo:            {resultado.get('modelo')}")
+            print(f"  🖥️  Pantalla:          {resultado.get('pantalla') or 'No especificada'}")
+            print(f"  ⚡ Procesador:        {resultado.get('procesador') or 'No especificado'}")
+            print(f"  🧠 Memoria RAM:       {resultado.get('ram') or 'No especificada'}")
+            print(f"  💾 Almacenamiento:    {resultado.get('almacenamiento') or 'No especificado'}")
+            print(f"  📸 Camara Principal:  {resultado.get('camara_principal') or 'No especificada'}")
+            print(f"  🤳 Camara Frontal:    {resultado.get('camara_frontal') or 'No especificada'}")
+            print(f"  🔋 Bateria y Carga:   {resultado.get('bateria') or 'No especificada'}")
+            print(f"  ⚙️  Sist. Operativo:   {resultado.get('sistema_operativo') or 'No especificado'}")
+            print(f"  📶 Conectividad:      {resultado.get('conectividad') or 'No especificada'}")
+            print(f"  ✨ Extras:            {resultado.get('extras') or 'No especificados'}")
+            print(f"  💰 Precio Oficial:    ${resultado.get('precio_oficial')} {resultado.get('moneda')}")
+            print(f"  🖼️  Foto Oficial:      {resultado.get('url_imagen') or 'No disponible'}")
+            print("=" * 80)
             print("\n[JSON Estructurado para Flutter / Base de Datos]:")
             print(json.dumps(resultado, indent=2, ensure_ascii=False))
-            print("-" * 70)
+            print("-" * 80)
 
         except KeyboardInterrupt:
             print("\n\nSaliendo...")

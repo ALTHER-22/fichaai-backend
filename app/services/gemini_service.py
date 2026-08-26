@@ -18,10 +18,11 @@ class FichaExtraida(BaseModel):
 
 class GeminiService:
     @staticmethod
-    def extraer_ficha_desde_texto(texto: str) -> dict:
+    def extraer_ficha_desde_texto(texto_o_modelo: str) -> dict:
         """
-        Llama a Gemini AI (gemini-3.6-flash) para extraer las especificaciones técnicas 
-        desde un texto libre y devolverlo estructurado en JSON.
+        Llama a Gemini AI (gemini-3.6-flash).
+        Si recibe solo el nombre del celular (ej: 'Samsung Galaxy A55'), genera su ficha técnica oficial.
+        Si recibe un párrafo largo de especificaciones, lo analiza y extrae estructurado en JSON.
         """
         api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
@@ -30,17 +31,17 @@ class GeminiService:
         client = genai.Client(api_key=api_key)
         
         prompt = (
-            "Eres un asistente especializado en tecnología y smartphones para la plataforma FichaAI. "
-            "Tu tarea es analizar el siguiente texto y extraer con precisión las especificaciones técnicas "
-            "del dispositivo móvil.\n\n"
-            "Reglas de extracción:\n"
-            "- 'modelo': Nombre comercial completo del dispositivo (ej: 'Samsung Galaxy A55 5G').\n"
-            "- 'procesador': Nombre del chipset/CPU (ej: 'Exynos 1480', 'Snapdragon 8 Gen 3').\n"
-            "- 'camara_principal': Resolución o detalle del sensor principal (ej: '50 MP con OIS').\n"
-            "- 'almacenamiento': Capacidad de memoria interna (ej: '256 GB', '128 GB').\n"
-            "- 'precio_oficial': Valor numérico del precio exacto si aparece (ej: 449.99). Si no hay precio, dejar null.\n"
-            "- 'moneda': Código ISO de 3 letras de la moneda (ej: 'USD', 'EUR'). Por defecto 'USD'.\n\n"
-            f"Texto a procesar:\n\"\"\"{texto}\"\"\""
+            "Eres el motor de búsqueda inteligente de FichaAI, especializado en smartphones y tecnología móvil. "
+            "A partir de la entrada del usuario (que puede ser solo el NOMBRE/MODELO del celular o un TEXTO con especificaciones), "
+            "proporciona con máxima precisión técnica su Ficha Técnica oficial.\n\n"
+            "Reglas de los campos:\n"
+            "- 'modelo': Nombre comercial completo oficial (ej: 'Samsung Galaxy A55 5G', 'iPhone 15 Pro Max').\n"
+            "- 'procesador': Procesador exacto (ej: 'Samsung Exynos 1480', 'Apple A17 Pro', 'Snapdragon 8 Gen 3').\n"
+            "- 'camara_principal': Sensor principal (ej: '50 MP f/1.8 OIS', '48 MP principal').\n"
+            "- 'almacenamiento': Capacidad base o habitual (ej: '128 GB', '256 GB / 512 GB').\n"
+            "- 'precio_oficial': Precio oficial de lanzamiento o referencia en dólares numérico (ej: 449.00).\n"
+            "- 'moneda': Código de moneda 'USD'.\n\n"
+            f"Entrada del usuario:\n\"\"\"{texto_o_modelo}\"\"\""
         )
 
         response = client.models.generate_content(
@@ -55,4 +56,4 @@ class GeminiService:
         if response.parsed:
             return response.parsed.model_dump()
         else:
-            raise ValueError("No se pudo extraer la información estructurada con la IA.")
+            raise ValueError("No se pudo estructurar la información con la IA.")

@@ -166,3 +166,21 @@ def encolar_reporte(id_ficha):
         'mensaje': 'Generacion de reporte PDF encolada correctamente',
         'tarea': 'generar_reporte_pdf'
     }), 202
+
+
+# AI EXTRACTION - POST /api/fichas/extraer-ia
+@bp.route('/fichas/extraer-ia', methods=['POST'])
+@jwt_required()
+def extraer_ficha_ia():
+    data = request.get_json(silent=True)
+    if not data or not data.get('texto'):
+        return jsonify({'exito': False, 'mensaje': 'El campo texto es obligatorio para la extracción'}), 400
+
+    from app.services.gemini_service import GeminiService
+    try:
+        resultado = GeminiService.extraer_ficha_desde_texto(data['texto'])
+        return jsonify({'exito': True, 'datos': resultado, 'mensaje': 'Extracción exitosa'}), 200
+    except ValueError as e:
+        return jsonify({'exito': False, 'mensaje': str(e)}), 400
+    except Exception as e:
+        return jsonify({'exito': False, 'mensaje': f'Error en la IA: {str(e)}'}), 500

@@ -27,3 +27,5 @@ google-genai
 pydantic
 beautifulsoup4
 requests
+
+duckduckgo-search

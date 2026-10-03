@@ -22,22 +22,29 @@ class FichaExtraida(BaseModel):
     sistema_operativo: str
     conectividad: str
     extras: str
+    precio_oficial: float
+    moneda: str
 
 
 MODELOS_IA = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash']
 
 
 def _redactar_con_ia(ficha: dict) -> Optional[dict]:
-    """La IA traduce y resume la ficha oficial de GSMArena a un español técnico y limpio."""
+    """La IA traduce y resume la ficha oficial de GSMArena y calcula el MSRP oficial en USD."""
     api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key:
         return None
     client = genai.Client(api_key=api_key)
     prompt = (
         'Eres el redactor técnico oficial de FichaAI. A continuación tienes la FICHA TÉCNICA OFICIAL '
-        f'del smartphone "{ficha["modelo"]}" en formato clave:valor (fuente GSMArena).\n'
+        f'del smartphone "{ficha["modelo"]}" (fabricante: {ficha["fabricante"]}) en formato clave:valor (fuente GSMArena).\n'
         'Redacta cada campo en ESPAÑOL, de forma clara, profesional y concisa (máx. ~120 caracteres por campo).\n'
-        'REGLAS: usa EXCLUSIVAMENTE los datos dados; NO inventes especificaciones.\n\n'
+        'REGLAS OBLIGATORIAS:\n'
+        '1. Usa los datos técnicos de GSMArena para procesador, memoria, pantalla, cámaras, batería, etc.\n'
+        '2. Para "precio_oficial" y "moneda": Debes indicar el PRECIO OFICIAL DE LANZAMIENTO GLOBAL APROXIMADO en dólares estadounidenses (USD / MSRP). '
+        'Ignora ofertas de revendedores o precios inflados de importación. Si la ficha menciona precios en euros, libras o rupias, conviértelo al MSRP oficial en USD equivalente. '
+        '(Ejemplos de referencia: iPhone 16 Pro = 999.0, Samsung Galaxy A55 = 480.0, Tecno Spark 20 Pro Plus = 200.0, Xiaomi 14 Ultra = 1499.0, Honor Magic 8 Lite = 349.0). '
+        'El campo "moneda" debe ser "USD".\n\n'
         f'{json.dumps(ficha["specs"], ensure_ascii=False)}'
     )
     for modelo in MODELOS_IA:
@@ -66,7 +73,7 @@ def _generar_fallback_ia(consulta: str) -> dict:
     client = genai.Client(api_key=api_key)
     prompt = (
         f'Genera la ficha técnica oficial y realista en ESPAÑOL para el smartphone: "{consulta}". '
-        'Incluye procesador exacto, cámaras, batería, pantalla y detalles de hardware.'
+        'Incluye procesador exacto, cámaras, batería, pantalla, detalles de hardware y el precio oficial de lanzamiento en USD.'
     )
     for modelo in MODELOS_IA:
         try:
@@ -81,7 +88,6 @@ def _generar_fallback_ia(consulta: str) -> dict:
             )
             if r.parsed:
                 d = r.parsed.model_dump()
-                d['precio_oficial'] = 399.0
                 d['moneda'] = 'USD'
                 d['imagenes'] = ['https://fdn2.gsmarena.com/vv/bigpic/xiaomi-14-ultra-new.jpg']
                 d['url_imagen'] = d['imagenes'][0]
@@ -112,7 +118,12 @@ class GeminiService:
                 if ia:
                     ia['modelo'] = base['modelo']
                     ia['fabricante'] = base['fabricante']
-                    base.update({k: v for k, v in ia.items() if v})
+                    base.update({k: v for k, v in ia.items() if v is not None})
+
+            # Asegurar moneda USD y precio de lanzamiento coherente
+            if not base.get('precio_oficial') or base['precio_oficial'] <= 0:
+                base['precio_oficial'] = 299.0
+            base['moneda'] = 'USD'
 
             base['imagenes'] = ficha['imagenes']
             base['url_imagen'] = ficha['imagenes'][0] if ficha['imagenes'] else None

@@ -166,8 +166,11 @@ def obtener_ficha(consulta: str) -> Optional[dict]:
                 if src and src.startswith('http') and src not in fotos:
                     fotos.append(src)
 
-    if bigpic:
-        fotos = [bigpic] + [f for f in fotos if f != bigpic]
+    # Priorizar SIEMPRE fotografías oficiales en Alta Resolución (HD 700px+):
+    # 'bigpic' de GSMArena es una miniatura lateral de solo 160x212 px.
+    # NUNCA colocar 'bigpic' de primero si disponemos de fotos HD de la galería oficial.
+    if not fotos and bigpic:
+        fotos = [bigpic]
 
     precio, moneda = _precio(specs.get('price', ''))
     ficha = {
